@@ -46,7 +46,7 @@ for i in range(len(links)):
 
     res1 = session.get(url)
     res2 = requests.get(url)
-    res2.encoding = 'utf-8'
+    res2.encoding = 'utf-8' #encoding for chinese if you use English, just remove this line
     soup = BeautifulSoup(res2.text, 'lxml')
     title=soup.title.string
     
