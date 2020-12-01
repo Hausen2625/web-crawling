@@ -8,7 +8,7 @@ import pandas as pd
 session = HTMLSession()
 
 
-#获取四大交易所公告通知中所有链接
+#get all the links of announcements on the four websites  获取四大交易所公告通知中所有链接
 def get_url():
     links_all = []
     url = ['http://www.shfe.com.cn/news/notice/','http://www.cffex.com.cn/jysgg/','http://www.cffex.com.cn/jystz/','http://app.czce.com.cn/cms/pub/search/searchdt.jsp','http://www.dce.com.cn/dalianshangpin/yw/fw/jystz/ywtz/index.html']
@@ -25,7 +25,7 @@ def get_url():
 links = list(get_url())
 
 
-#排除干扰项
+#exclude some useless links排除干扰项链接
 for item in links[:]:
     judgment1 = re.findall(r'./(\d*).htm',item)#sh czce cffex
     judgment2 = re.findall(r'./(\d*)/index.html',item) #dce
@@ -37,8 +37,8 @@ for item in links[:]:
         links.remove(item)
 
 
-#爬取关键字关联网页地址
-pairlist = ['交割有效期限','涨跌停板幅度','股指期货','股指期权','PTA交割']
+#Crawl announcements containing certain keywords from the announcement columns of several websites爬取包含关键字关联网页地址
+pairlist = ['交割有效期限','涨跌停板幅度','股指期货','股指期权','PTA交割'] #keywords list 关键字列表
 important_urls = []
 for i in range(len(links)):
     pair = []
@@ -61,7 +61,7 @@ for i in range(len(links)):
     
 print(important_urls)
 
-#抓取网页文本
+#crawl the content of website(different website,different processing methods) 抓取网页文本(每个网页的内容爬取需要特别定制)
 main_addresslist = ['http://www.shfe.com.cn','http://www.cffex.com.cn','http://app.czce.com.cn','http://www.dce.com.cn']
 content_list = []
 for i in range(len(important_urls)):
@@ -76,12 +76,11 @@ for i in range(len(important_urls)):
         content_list.append(list(map(lambda x: x.text,res1.html.find('div.detail_content p'))))        
 #print(content_list)
 
+#export to the excel 输出到excel并保存
 dataframe = pd.DataFrame(content_list)
 dataframe.to_excel('./announcement.xls')
     
 
-
 '''
-12.1更新：修复除上海期货交易所以外网站关键字无法匹配的问题（将编码设置为utf-8即可）
-采用标题匹配的方式，排除一些干扰网址
+初始版本待后续更新 waiting for updating
 '''
