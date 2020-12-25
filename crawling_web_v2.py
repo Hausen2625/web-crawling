@@ -8,11 +8,10 @@ import os
 import xlwt
 import difflib
 
-#获取四大交易所公告通知中所有链接
+#get all the links of announcements on the four websites  获取四大交易所公告通知中所有链接
 def get_url(webs):
     session = HTMLSession()
     links_all = []
-    url = ['http://www.shfe.com.cn/news/notice/','http://www.cffex.com.cn/jysgg/','http://www.cffex.com.cn/jystz/','http://app.czce.com.cn/cms/pub/search/searchdt.jsp','http://www.dce.com.cn/dalianshangpin/yw/fw/jystz/ywtz/index.html']
     try:
         for i in range(len(webs)):
             res = session.get(webs[i])
@@ -46,7 +45,7 @@ def simi_rate(str1, str2):
 def get_announce(key_list,webs): #获取当日有用的公告通知标题与内容
     session = HTMLSession()
     links = list(get_url(webs))
-    #排除干扰项，提高运行效率
+    #exclude some useless links排除干扰项链接
     for item in links[:]:
         judgment1 = re.findall(r'./(\d*).htm',item)#sh czce cffex
         judgment2 = re.findall(r'./(\d*)/index.html',item) #dce
@@ -55,7 +54,7 @@ def get_announce(key_list,webs): #获取当日有用的公告通知标题与内�
         else:
             links.remove(item)
 
-    #爬取关键字关联网页地址
+    #Crawl announcements containing certain keywords from the announcement columns of several websites爬取包含关键字关联网页地址
     pairlist = key_list
     important_urls = []
     for i in range(len(links)):
@@ -63,7 +62,7 @@ def get_announce(key_list,webs): #获取当日有用的公告通知标题与内�
         url = links[i]
         res1 = session.get(url)
         res2 = requests.get(url)
-        res2.encoding = 'utf-8'
+        res2.encoding = 'utf-8' #encoding for chinese if you use English, just remove this line
         soup = BeautifulSoup(res2.text, 'lxml')
         if soup.title:
             title=soup.title.string
@@ -78,14 +77,14 @@ def get_announce(key_list,webs): #获取当日有用的公告通知标题与内�
         if pair:
             important_urls.append(url)
 
-    #抓取网页文本
+    #crawl the content of website(different website,different processing methods) 抓取网页文本(每个网页的内容爬取需要特别定制)
     content_list = []
     title_list = []
     url_list = []
     print(important_urls)
     for item in important_urls:
         res1 = session.get(item)
-        res1.encoding = 'utf-8'
+        res1.encoding = 'utf-8' #encoding for chinese if you use English, just remove this line
         soup = BeautifulSoup(res1.text, 'lxml')
         title=soup.title.string
         #网页标题去重
