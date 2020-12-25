@@ -20,11 +20,11 @@ def get_url(webs):
         get_url(webs)
     return links_all
 
-def time_trans(time_str): #['年','月','日'] 用于解析网页日期形式
+def time_trans(time_str): #['年','月','日'] 用于解析网页日期形式 used to transform the format of date to ['Y','M','D']
     date_list = re.findall(r"\d+\.?\d*",time_str)
     return date_list
-def compare_date(time_get): #用于直接比较网页日期与当前系统日期
-    stp = time.strftime('%Y-%m-%d')
+def compare_date(time_get): #用于直接比较网页日期与当前系统日期 used to compare the date of announcement and system
+     stp = time.strftime('%Y-%m-%d')
     stp_list = time_trans(stp)
     time_getlist = time_trans(time_get)
     if stp_list == time_getlist:
@@ -32,7 +32,7 @@ def compare_date(time_get): #用于直接比较网页日期与当前系统日期
     else:
         return False
 
-def content_deal(content_temp,title,content_list,title_list): #用于处理公告内容除噪
+def content_deal(content_temp,title,content_list,title_list): #用于处理公告内容除噪 used to remove noise of content
     content_temp = "".join(content_temp)
     content_temp = "".join(content_temp.split())
     content_list.append(content_temp)
@@ -42,7 +42,7 @@ def content_deal(content_temp,title,content_list,title_list): #用于处理公�
 def simi_rate(str1, str2):
     return difflib.SequenceMatcher(None, str1, str2).quick_ratio()
 
-def get_announce(key_list,webs): #获取当日有用的公告通知标题与内容
+def get_announce(key_list,webs): #获取当日有用的公告通知标题与内容 used to obtain the needed titles and content
     session = HTMLSession()
     links = list(get_url(webs))
     #exclude some useless links排除干扰项链接
@@ -67,7 +67,7 @@ def get_announce(key_list,webs): #获取当日有用的公告通知标题与内�
         if soup.title:
             title=soup.title.string
         else:
-            print('今日网站部分无更新！')        
+            print('No update today!')        
         for item in pairlist:
             pair_single=re.findall(item,title)
             if pair_single:
@@ -87,7 +87,7 @@ def get_announce(key_list,webs): #获取当日有用的公告通知标题与内�
         res1.encoding = 'utf-8' #encoding for chinese if you use English, just remove this line
         soup = BeautifulSoup(res1.text, 'lxml')
         title=soup.title.string
-        #网页标题去重
+        #网页标题去重 remove duplicates
         highest_simi = 0
         simi_list = []
         if title and len(title_list)>=1:
@@ -96,7 +96,7 @@ def get_announce(key_list,webs): #获取当日有用的公告通知标题与内�
             highest_simi = max(simi_list)
         else:
             pass
-        if list(map(lambda x: x.text,res1.html.find('p.article-date'))): #获取文章日期
+        if list(map(lambda x: x.text,res1.html.find('p.article-date'))): #获取文章日期 obtain date of the announcement
             time_sh = list(map(lambda x: x.text,res1.html.find('p.article-date')))[0]
         elif list(map(lambda x: x.text,res1.html.find('p.noice_date'))):
             time_dl = list(map(lambda x: x.text,res1.html.find('p.noice_date')))[0]
@@ -107,7 +107,7 @@ def get_announce(key_list,webs): #获取当日有用的公告通知标题与内�
         else:
             pass
             
-        if 'www.shfe.com.cn/news/notice' in item and highest_simi<=0.75 and compare_date(time_sh): #去重与日期比较功能
+        if 'www.shfe.com.cn/news/notice' in item and highest_simi<=0.75 and compare_date(time_sh): #去重与日期比较功能  remove  duplicates and compare the date
             content_temp = list(map(lambda x: x.text,res1.html.find('div.article-detail-text p')))            
             title_list,content_list = content_deal(content_temp,title,content_list,title_list)
             url_list.append(item)
@@ -127,7 +127,7 @@ def get_announce(key_list,webs): #获取当日有用的公告通知标题与内�
             pass
 
     if not title_list:
-        print('今日网站无新通知！')
+        print('No update today!')
         return title_list,content_list,url_list
     else:
         return title_list,content_list,url_list
