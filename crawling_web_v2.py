@@ -107,7 +107,7 @@ def get_announce(key_list,webs): #获取当日有用的公告通知标题与内�
         else:
             pass
             
-        if 'www.shfe.com.cn/news/notice' in item and highest_simi<=0.75 and compare_date(time_sh): #去重与日期比较功能  remove  duplicates and compare the date
+        if 'www.shfe.com.cn/news/notice' in item and highest_simi<=0.75 and compare_date(time_sh): #去重与日期比较功能  remove duplicates and compare the date，if you need not only today's infomations, just remove the compare_date modules. 
             content_temp = list(map(lambda x: x.text,res1.html.find('div.article-detail-text p')))            
             title_list,content_list = content_deal(content_temp,title,content_list,title_list)
             url_list.append(item)
